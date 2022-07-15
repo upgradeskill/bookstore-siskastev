@@ -26,3 +26,10 @@ func (b *Book) Create() error {
 	}
 	return nil
 }
+
+func GetBookByIsbn(isbn string) ([]Book, error) {
+	if err := config.DB.Where("isbn = ?", isbn).Take(&Books).Error; err != nil {
+		return nil, err
+	}
+	return Books, nil
+}

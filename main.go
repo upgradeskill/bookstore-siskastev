@@ -3,8 +3,10 @@ package main
 import (
 	"bookstore-siskastev/config"
 	"bookstore-siskastev/model"
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -18,6 +20,7 @@ func main() {
 	config.InitDB()
 	route.GET("/books", getBooks)
 	route.POST("/books", createBooks)
+	route.GET("/book/:id", getBookByIsbn)
 	route.Start(":8000")
 	fmt.Println("server started at localhost:8000")
 
@@ -41,4 +44,17 @@ func createBooks(ctx echo.Context) error {
 		Message: "Success Create Book",
 		Data:    book,
 	})
+}
+
+func getBookByIsbn(ctx echo.Context) error {
+	id := ctx.Param("id")
+	book, err := model.GetBookByIsbn(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.JSON(http.StatusNotFound, err)
+		}
+
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+	return ctx.JSON(http.StatusOK, Result{Message: "Success Get Data", Data: book})
 }
