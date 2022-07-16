@@ -19,8 +19,9 @@ func main() {
 	route := echo.New()
 	config.InitDB()
 	route.GET("/books", getBooks)
-	route.POST("/books", createBooks)
 	route.GET("/book/:id", getBookByIsbn)
+	route.POST("/books", createBooks)
+	route.PUT("/book/:id", updateBook)
 	route.DELETE("/book/:id", deleteBook)
 	route.Start(":8000")
 	fmt.Println("server started at localhost:8000")
@@ -49,25 +50,44 @@ func createBooks(ctx echo.Context) error {
 
 func getBookByIsbn(ctx echo.Context) error {
 	id := ctx.Param("id")
-	book, err := model.GetBookByIsbn(id)
+	err := model.GetBookByIsbn(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ctx.JSON(http.StatusNotFound, Result{Message: err.Error(), Data: nil})
 		}
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(http.StatusOK, Result{Message: "Success Get Data", Data: book})
+	return ctx.JSON(http.StatusOK, Result{Message: "Success Get Data", Data: model.Books})
 }
 
 func deleteBook(ctx echo.Context) error {
 	id := ctx.Param("id")
-	book, err := model.GetBookByIsbn(id)
-	if book == nil {
+	err := model.GetBookByIsbn(id)
+	if err != nil {
 		return ctx.JSON(http.StatusNotFound, Result{Message: err.Error(), Data: nil})
 	}
-	errorDelete := model.DeleteBook(id)
+	errorDelete := model.Delete(id)
 	if errorDelete != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 	return ctx.JSON(http.StatusOK, Result{Message: "Success Deleted Data", Data: nil})
+}
+
+func updateBook(ctx echo.Context) error {
+	id := ctx.Param("id")
+	errNotFound := model.GetBookByIsbn(id)
+	if errNotFound != nil {
+		return ctx.JSON(http.StatusNotFound, Result{Message: errNotFound.Error(), Data: nil})
+	}
+	book := new(model.Book)
+	book.Isbn = id
+	ctx.Bind(&book)
+	if err := book.Update(id); err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+	return ctx.JSON(http.StatusOK, Result{
+		Message: "Success Update Book",
+		Data:    book,
+	})
+
 }

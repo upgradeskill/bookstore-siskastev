@@ -5,10 +5,10 @@ import (
 )
 
 type Book struct {
-	Isbn   string  `gorm:"isbn"`
-	Title  string  `gorm:"title"`
-	Author string  `gorm:"author"`
-	Price  float32 `gorm:"price"`
+	Isbn   string  `json:"isbn" gorm:"isbn"`
+	Title  string  `json:"title" gorm:"title"`
+	Author string  `json:"author"gorm:"author"`
+	Price  float32 `json:"price" gorm:"price"`
 }
 
 var Books []Book
@@ -27,17 +27,23 @@ func (b *Book) Create() error {
 	return nil
 }
 
-func GetBookByIsbn(isbn string) ([]Book, error) {
+func GetBookByIsbn(isbn string) error {
 	if err := config.DB.Where("isbn = ?", isbn).Take(&Books).Error; err != nil {
-		return nil, err
+		return err
 	}
-	return Books, nil
+	return nil
 }
 
-func DeleteBook(isbn string) error {
+func Delete(isbn string) error {
 	if err := config.DB.Where("isbn = ?", isbn).Delete(&Books).Error; err != nil {
 		return err
 	}
 	return nil
+}
 
+func (b *Book) Update(isbn string) error {
+	if err := config.DB.Where("isbn = ?", isbn).Updates(Book{Title: b.Title, Author: b.Author, Price: b.Price}).Error; err != nil {
+		return err
+	}
+	return nil
 }
