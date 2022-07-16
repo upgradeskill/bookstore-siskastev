@@ -33,3 +33,11 @@ func GetBookByIsbn(isbn string) ([]Book, error) {
 	}
 	return Books, nil
 }
+
+func DeleteBook(isbn string) error {
+	if err := config.DB.Where("isbn = ?", isbn).Delete(&Books).Error; err != nil {
+		return err
+	}
+	return nil
+
+}

@@ -21,6 +21,7 @@ func main() {
 	route.GET("/books", getBooks)
 	route.POST("/books", createBooks)
 	route.GET("/book/:id", getBookByIsbn)
+	route.DELETE("/book/:id", deleteBook)
 	route.Start(":8000")
 	fmt.Println("server started at localhost:8000")
 
@@ -51,10 +52,22 @@ func getBookByIsbn(ctx echo.Context) error {
 	book, err := model.GetBookByIsbn(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ctx.JSON(http.StatusNotFound, err)
+			return ctx.JSON(http.StatusNotFound, Result{Message: err.Error(), Data: nil})
 		}
-
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 	return ctx.JSON(http.StatusOK, Result{Message: "Success Get Data", Data: book})
+}
+
+func deleteBook(ctx echo.Context) error {
+	id := ctx.Param("id")
+	book, err := model.GetBookByIsbn(id)
+	if book == nil {
+		return ctx.JSON(http.StatusNotFound, Result{Message: err.Error(), Data: nil})
+	}
+	errorDelete := model.DeleteBook(id)
+	if errorDelete != nil {
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+	return ctx.JSON(http.StatusOK, Result{Message: "Success Deleted Data", Data: nil})
 }
