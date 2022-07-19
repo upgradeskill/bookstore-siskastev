@@ -2,22 +2,26 @@ package config
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 var DB *gorm.DB
 
-const (
-	DBUser     = "root"
-	DBPassword = ""
-	DBName     = "go_basic"
-	DBHost     = "127.0.0.1"
-	DBPort     = "3306"
-)
-
 func connectDB() *gorm.DB {
+	errEnv := godotenv.Load()
+	if errEnv != nil {
+		panic("Failed to load env")
+	}
+	DBUser := os.Getenv("DB_USER")
+	DBPassword := os.Getenv("DB_PASS")
+	DBName := os.Getenv("DB_NAME")
+	DBHost := os.Getenv("DB_HOST")
+	DBPort := os.Getenv("DB_PORT")
+
 	DBurl := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", DBUser, DBPassword, DBHost, DBPort, DBName)
 	db, err := gorm.Open(mysql.Open(DBurl), &gorm.Config{})
 	if err != nil {

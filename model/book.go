@@ -5,10 +5,10 @@ import (
 )
 
 type Book struct {
-	Isbn   string  `json:"isbn" gorm:"isbn"`
-	Title  string  `json:"title" gorm:"title"`
-	Author string  `json:"author"gorm:"author"`
-	Price  float32 `json:"price" gorm:"price"`
+	Isbn   string  `json:"isbn"`
+	Title  string  `json:"title"`
+	Author string  `json:"author"`
+	Price  float32 `json:"price"`
 }
 
 var Books []Book
