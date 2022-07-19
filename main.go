@@ -19,10 +19,10 @@ func main() {
 	route := echo.New()
 	config.InitDB()
 	route.GET("/books", getBooks)
-	route.GET("/book/:id", getBookByIsbn)
+	route.GET("/books/:id", getBookByIsbn)
 	route.POST("/books", createBooks)
-	route.PUT("/book/:id", updateBook)
-	route.DELETE("/book/:id", deleteBook)
+	route.PUT("/books/:id", updateBook)
+	route.DELETE("/books/:id", deleteBook)
 	route.Start(":8000")
 	fmt.Println("server started at localhost:8000")
 
