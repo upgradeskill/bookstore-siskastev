@@ -16,7 +16,7 @@ func Auth(ctx echo.HandlerFunc) echo.HandlerFunc {
 				"message": "Unauthorized",
 			})
 		}
-		_, err := helpers.ValidateToken(bearerToken)
+		err := helpers.ValidateToken(bearerToken)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, map[string]string{
 				"message": err.Error(),
