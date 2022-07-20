@@ -19,7 +19,7 @@ func Register(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, errGeneratePass.Error())
 	}
 	if err := user.Create(); err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return ctx.JSON(http.StatusCreated, map[string]interface{}{
 		"message": "Success Register User",

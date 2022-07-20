@@ -12,11 +12,15 @@ func Auth(ctx echo.HandlerFunc) echo.HandlerFunc {
 		authHeader := c.Request().Header.Get("Authorization")
 		bearerToken := (strings.Split(authHeader, " "))[1]
 		if bearerToken == "" {
-			return c.JSON(http.StatusUnauthorized, "Unauthorized")
+			return c.JSON(http.StatusUnauthorized, map[string]string{
+				"message": "Unauthorized",
+			})
 		}
 		_, err := helpers.ValidateToken(bearerToken)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, err.Error())
+			return c.JSON(http.StatusUnauthorized, map[string]string{
+				"message": err.Error(),
+			})
 		}
 		return ctx(c)
 	}

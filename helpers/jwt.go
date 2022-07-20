@@ -14,14 +14,12 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-var JWT_SECRET = os.Getenv("JWT_SECRET")
-
 func GenerateJwtToken(email string) (string, error) {
-	if JWT_SECRET == "" {
+	if os.Getenv("JWT_SECRET") == "" {
 		log.Fatal("[ ERROR ] JWT_SECRET environment variable not provided!\n")
 	}
 
-	key := []byte(JWT_SECRET)
+	key := []byte(os.Getenv("JWT_SECRET"))
 
 	expirationTime := time.Now().Add(5 * time.Minute)
 	claims := &Claims{
@@ -42,7 +40,7 @@ func GenerateJwtToken(email string) (string, error) {
 }
 
 func ValidateToken(strToken string) (*Claims, error) {
-	key := []byte(JWT_SECRET)
+	key := []byte(os.Getenv("JWT_SECRET"))
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(strToken, claims, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
